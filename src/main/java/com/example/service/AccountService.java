@@ -20,16 +20,34 @@ public class AccountService {
     }
 
     public Account registerAccount(Account account) {
-        Account addedAccount = account;
+        //Account addedAccount = account;
 
-        if(addedAccount == null || addedAccount.getPassword().length() < 4 || addedAccount.getUsername().isEmpty()){
+
+        if(accountRepository.findByUsername(account.getUsername()) != null ){
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+        else if(account.getPassword().length() < 4 || account.getUsername().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
+        
+
         else{
-            return accountRepository.save(addedAccount);
+            return accountRepository.save(account);
         }
         
+    }
+
+    public Account userLogin(Account account){
+
+        if(accountRepository.findByUsername(account.getUsername()) == null || accountRepository.findByPassword(account.getPassword()) == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+
+        else{
+            return accountRepository.save(account);
+        }
     }
 
 }

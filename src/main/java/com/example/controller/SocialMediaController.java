@@ -7,6 +7,7 @@ import com.example.service.MessageService;
 import com.example.repository.AccountRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class SocialMediaController {
 
+    public SocialMediaController(AccountService accountService, MessageService messageService) {
+        this.accountService = accountService;
+        this.messageService = messageService;
+    }
+    
     AccountService accountService;
     MessageService messageService;
-    
+
 
 
 
@@ -55,35 +61,38 @@ public class SocialMediaController {
         
     }
     
-    @PostMapping(path = "login")
+    @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public @ResponseBody Account userLoginHandler(@RequestBody Account account){
+    public ResponseEntity<Account> userLoginHandler(@RequestBody Account account){
         
-        if(account.getUsername() == null || account.getPassword() == null){
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        Account addedAccount = accountService.userLogin(account);
+
+        if(addedAccount == null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            
         }
 
-        return account;
+        else{
+            return ResponseEntity.status(200).body(addedAccount);
+        }
 
         
         
     }
 
-    @PostMapping(path = "messages")
-    public @ResponseBody Message createNewMessageHandler(@RequestBody Message message){
+    @PostMapping("/messages")
+    public ResponseEntity<Message> createNewMessageHandler(@RequestBody Message message){
         
-        
-
-        if(message.getMessageText() == "" || message.getPostedBy() == null || message.getMessageText().length() > 255){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        else if(message.getMessageId() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
         Message addedMessage = messageService.createMessageText(message);
-        return message;
+        if(addedMessage != null){
+            return ResponseEntity.status(200).body(addedMessage);
+        }
+
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            
+            
+        }       
         //throw new ResponseStatusException(HttpStatus.OK);
         
 
@@ -106,20 +115,23 @@ public class SocialMediaController {
         
     }
 
-    //@GetMapping(path = "messages/{message_id}")
-    //@ResponseStatus(HttpStatus.OK)
-    //@ResponseBody
-
-    //@DeleteMapping(path = "messages/{message_id}")
-    //@ResponseStatus(HttpStatus.OK)
-    //@ResponseBody
-
-    @PatchMapping(path = "messages/{message_id}")
+    @GetMapping(path = "messages/{messageId}")
     @ResponseBody
-    public ResponseEntity<?> updateMessageText(@PathVariable Integer messageId, @RequestBody Message messageText){
+    public ResponseEntity<?> getMessageById(@PathVariable Integer messageId){
+        Optional<Message> getMessage = messageService.getMessageById(messageId);
+        
+        return ResponseEntity.status(200).body(getMessage);
+        
+
+        
+    }
+
+    @DeleteMapping(path = "messages/{message_id}")
+    @ResponseBody
+    public ResponseEntity<Integer> deleteMessageHandler(@PathVariable Integer messageId, @RequestBody Message messageText){
         Message updatedMessage = messageService.updateMessageText(messageId, messageText);
         if(updatedMessage != null){
-            return ResponseEntity.ok(updatedMessage);
+            return ResponseEntity.status(200).body(1);
         }
 
         else{
@@ -127,10 +139,24 @@ public class SocialMediaController {
         }
     }
 
-    //@GetMapping(path = "accounts/{account_id}/messages")
-    //@ResponseStatus(HttpStatus.OK)
-    //@ResponseBody
-    
+    @PatchMapping(path = "messages/{messageId}")
+    @ResponseBody
+    public ResponseEntity<Integer> updateMessageText(@PathVariable Integer messageId, @RequestBody Message messageText){
+        Message updatedMessage = messageService.updateMessageText(messageId, messageText);
+        if(updatedMessage != null){
+            return ResponseEntity.status(200).body(1);
+        }
+
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "accounts/{account_id}/messages")
+    @ResponseBody
+    public ResponseEntity<Message> getAllMessagesforUserHandler(@PathVariable Integer accountId, @RequestBody Message messageText){
+        return ResponseEntity.status(200).body(messageText);
+    }
 
    
 

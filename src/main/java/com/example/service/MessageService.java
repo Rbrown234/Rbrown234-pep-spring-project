@@ -18,21 +18,41 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-    @Autowired
+    
     public List<Message> getAllMessages(){
         List<Message> messages = messageRepository.findAll();
         return messages;
     }
 
-    public Message createMessageText(Message messageText){
-        return messageRepository.save(messageText);
+    public Message createMessageText(Message message){
+
+        //if(message.getPostedBy() == null){
+        //    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        //}
+
+        if(message.getMessageText().length() <= 0 || message.getMessageId() == null || message.getMessageText().length() > 255){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        messageRepository.save(message);
+        return message;
     }
+
+    
+    public Optional<Message> getMessageById(int messageId){
+        Optional<Message> getMessage = messageRepository.findById(messageId);
+        
+        return getMessage;
+        
+
+    }
+
 
     public Message updateMessageText(int messageId, Message messageText){
         Optional<Message> messageOptional = messageRepository.findById(messageId);
         if(messageOptional.isPresent()){
             Message existingMessage = messageOptional.get();
-            if(existingMessage == null || messageText.getMessageText().length() > 0 || messageText.getMessageText().length() < 255){
+            if(existingMessage == null || messageText.getMessageText().length() <= 0 || messageText.getMessageText().length() > 255){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
             existingMessage.setMessageText(messageText.getMessageText());
