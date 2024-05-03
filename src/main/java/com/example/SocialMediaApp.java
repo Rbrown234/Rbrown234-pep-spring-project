@@ -10,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.boot.SpringApplication.run;
 
+
+
+
 /**
  * This is a class that is used to run your application.
  *
@@ -22,8 +25,12 @@ public class SocialMediaApp {
      * Runs the application
      * @param args The arguments of the program.
      * @throws InterruptedException 
+     * @throws IOException
      */
     public static void main(String[] args) throws InterruptedException {
         SpringApplication.run(SocialMediaApp.class, args);
+
+
+        
     }
 }
