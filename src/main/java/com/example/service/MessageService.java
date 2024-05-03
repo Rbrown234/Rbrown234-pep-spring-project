@@ -25,12 +25,13 @@ public class MessageService {
     }
 
     public Message createMessageText(Message message){
+        //Message getMessage = messageRepository.getById(message.getMessageId());
 
-        //if(message.getPostedBy() == null){
+        //if(getMessage == null){
         //    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         //}
 
-        if(message.getMessageText().length() <= 0 || message.getMessageId() == null || message.getMessageText().length() > 255){
+        if(message.getMessageText().length() <= 0 || message.getPostedBy() != null || message.getMessageText().length() > 255){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
