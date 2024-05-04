@@ -27,9 +27,9 @@ public class MessageService {
     public Message createMessageText(Message message){
         //Message getMessage = messageRepository.getById(message.getMessageId());
 
-        //if(getMessage == null){
-        //    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        //}
+        if(message.getPostedBy() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
         if(message.getMessageText().length() <= 0 || message.getPostedBy() != null || message.getMessageText().length() > 255){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -40,12 +40,35 @@ public class MessageService {
     }
 
     
-    public Optional<Message> getMessageById(int messageId){
+    public Message getMessageById(int messageId){
         Optional<Message> getMessage = messageRepository.findById(messageId);
+        Message newMessage;
+        if(getMessage.isPresent()){
+            newMessage = getMessage.get();
+            return newMessage;
+        }
+
+        return null;
         
-        return getMessage;
         
 
+    }
+
+    public Message deleteMessageText(int messageId, Message message) {
+        Optional<Message> messageOptional = messageRepository.findById(messageId);
+        if(messageOptional.isPresent()){
+            Message existingMessage = messageOptional.get();
+            if(existingMessage == null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+            existingMessage.setMessageText(message.getMessageText());
+            messageRepository.delete(existingMessage);
+            return existingMessage;
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    
     }
 
 

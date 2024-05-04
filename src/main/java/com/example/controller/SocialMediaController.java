@@ -63,18 +63,12 @@ public class SocialMediaController {
     
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Account> userLoginHandler(@RequestBody Account account){
+    public Account userLoginHandler(@RequestBody Account account){
         
         Account addedAccount = accountService.userLogin(account);
-
-        if(addedAccount == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-            
-        }
-
-        else{
-            return ResponseEntity.status(200).body(addedAccount);
-        }
+        
+            return addedAccount;
+        
 
         
         
@@ -117,20 +111,20 @@ public class SocialMediaController {
 
     @GetMapping(path = "messages/{messageId}")
     @ResponseBody
-    public ResponseEntity<?> getMessageById(@PathVariable Integer messageId){
-        Optional<Message> getMessage = messageService.getMessageById(messageId);
+    public Message getMessageById(@PathVariable Integer messageId){
+        Message getMessage = messageService.getMessageById(messageId);
         
-        return ResponseEntity.status(200).body(getMessage);
+        return getMessage;
         
 
         
     }
 
-    @DeleteMapping(path = "messages/{message_id}")
+    @DeleteMapping(path = "messages/{messageId}")
     @ResponseBody
     public ResponseEntity<Integer> deleteMessageHandler(@PathVariable Integer messageId, @RequestBody Message messageText){
-        Message updatedMessage = messageService.updateMessageText(messageId, messageText);
-        if(updatedMessage != null){
+        Message deletedMessage = messageService.deleteMessageText(messageId, messageText);
+        if(deletedMessage != null){
             return ResponseEntity.status(200).body(1);
         }
 
@@ -155,6 +149,7 @@ public class SocialMediaController {
     @GetMapping(path = "accounts/{account_id}/messages")
     @ResponseBody
     public ResponseEntity<Message> getAllMessagesforUserHandler(@PathVariable Integer accountId, @RequestBody Message messageText){
+        
         return ResponseEntity.status(200).body(messageText);
     }
 

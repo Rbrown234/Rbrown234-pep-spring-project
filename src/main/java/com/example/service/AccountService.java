@@ -40,13 +40,16 @@ public class AccountService {
 
     public Account userLogin(Account account){
 
-        if(accountRepository.findByUsername(account.getUsername()) == null || accountRepository.findByPassword(account.getPassword()) == null){
+        Account userLoginAcc = accountRepository.findByUsernameAndPassword(account.getUsername(), account.getPassword());
+
+        if(userLoginAcc == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
 
         else{
-            return accountRepository.save(account);
+            return userLoginAcc;
+            
         }
     }
 
