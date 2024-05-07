@@ -25,18 +25,29 @@ public class MessageService {
     }
 
     public Message createMessageText(Message message){
-        //Message getMessage = messageRepository.getById(message.getMessageId());
+        Message createMessage = messageRepository.findByPostedBy(message.getPostedBy());
+        
 
-        if(message.getPostedBy() == null){
+        if(message.getMessageText().length() <= 0 || message.getMessageText().length() > 255){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        if(message.getMessageText().length() <= 0 || message.getPostedBy() != null || message.getMessageText().length() > 255){
+        else if (createMessage == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        messageRepository.save(message);
-        return message;
+        //else if(message != createMessage){
+        //    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        //}
+
+
+        //else{
+            messageRepository.save(message);
+            return message;
+        //}
+
+
+       
     }
 
     
@@ -54,19 +65,19 @@ public class MessageService {
 
     }
 
-    public Message deleteMessageText(int messageId, Message message) {
+    public Message deleteMessageText(int messageId) {
         Optional<Message> messageOptional = messageRepository.findById(messageId);
         if(messageOptional.isPresent()){
             Message existingMessage = messageOptional.get();
             if(existingMessage == null){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
-            existingMessage.setMessageText(message.getMessageText());
+            //existingMessage.setMessageText(message.getMessageText());
             messageRepository.delete(existingMessage);
             return existingMessage;
         }
         else{
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return null;
         }
     
     }
@@ -86,6 +97,15 @@ public class MessageService {
         else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public List<Message> getAllMessagesforUser(List<Integer> accountId){
+        
+        List<Message> messages = messageRepository.findAllById(accountId);
+        
+        
+
+        return messages;
     }
 
 }

@@ -62,12 +62,11 @@ public class SocialMediaController {
     }
     
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public Account userLoginHandler(@RequestBody Account account){
+    public ResponseEntity<Account> userLoginHandler(@RequestBody Account account){
         
         Account addedAccount = accountService.userLogin(account);
         
-            return addedAccount;
+        return ResponseEntity.status(200).body(addedAccount);
         
 
         
@@ -86,7 +85,11 @@ public class SocialMediaController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             
             
-        }       
+        } 
+
+        
+            
+        //return ResponseEntity.status(200).body(addedMessage);     
         //throw new ResponseStatusException(HttpStatus.OK);
         
 
@@ -122,15 +125,15 @@ public class SocialMediaController {
 
     @DeleteMapping(path = "messages/{messageId}")
     @ResponseBody
-    public ResponseEntity<Integer> deleteMessageHandler(@PathVariable Integer messageId, @RequestBody Message messageText){
-        Message deletedMessage = messageService.deleteMessageText(messageId, messageText);
+    public ResponseEntity<?> deleteMessageHandler(@PathVariable Integer messageId){
+        Message deletedMessage = messageService.deleteMessageText(messageId);
         if(deletedMessage != null){
             return ResponseEntity.status(200).body(1);
         }
 
-        else{
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        //throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(200).body("");
+        
     }
 
     @PatchMapping(path = "messages/{messageId}")
@@ -146,11 +149,12 @@ public class SocialMediaController {
         }
     }
 
-    @GetMapping(path = "accounts/{account_id}/messages")
+    @GetMapping(path = "accounts/{accountId}/messages")
     @ResponseBody
-    public ResponseEntity<Message> getAllMessagesforUserHandler(@PathVariable Integer accountId, @RequestBody Message messageText){
+    public ResponseEntity<?> getAllMessagesforUserHandler(@PathVariable List<Integer> accountId){
+        List<Message> messages = messageService.getAllMessagesforUser(accountId);
         
-        return ResponseEntity.status(200).body(messageText);
+        return ResponseEntity.status(200).body(messages);
     }
 
    
